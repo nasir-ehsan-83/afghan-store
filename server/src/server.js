@@ -1,19 +1,15 @@
-import express from "express";
+import app  from "./app.js";
+import configDotenv from "dotenv";
+import connecDB from "./config/db.js";
 
-const app = express();
+configDotenv();
+connecDB();
 
-const PORT = process.env.PORT || 4000;
-
-app.get('/', (req, res) => {
-    res.status(200).json({
-        "message": "successfully runed"
-    });
-});
+const PORT = process.env.PORT || 4500;
 
 app.listen(PORT, (err) => {
     if (err) {
         console.error(err);
     }
-
-    console.log(`Server running on ${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
