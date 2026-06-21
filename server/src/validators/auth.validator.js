@@ -8,3 +8,10 @@ export const registerSchema = z.object({
         password: z.string().min(8, "Password length should not be less than 8")
     })
 });
+
+export const loginSchema = z.object({
+    body: z.object({
+        username: z.string().min(3, "Username's length should not be less than 3"),
+        password: z.string().min(8, "Password length should not be less than 8")
+    })
+});
