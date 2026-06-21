@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 
+import authRoutes from "./routes/auth.routes";
+
 // create express's object
 const app = express();
 
@@ -11,6 +13,8 @@ app.use(cors({
 
 // use json () to parse json files
 app.use(express.json());
+
+app.use("/api/auth", authRoutes);
 
 // if there is not provided api
 app.use((req, res)=> {
