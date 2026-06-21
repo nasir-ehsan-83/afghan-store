@@ -1,17 +1,21 @@
 export const validate = (schema) => (req, res, next) => {
     try {
-        schema.parse({
+        const validatedData = schema.parse({
             body: req.body,
             query: req.query,
             params: req.params
         });
+
+        req.body = validatedData.body;
+        req.query = validatedData.query;
+        req.params = validatedData.params;
 
         return next();
     } catch (error) {
         return res.status(400).json({
             status: "error",
             errors: error.errors.map(err => ({
-                field: err.path[1], 
+                field: err.path.slice(1).join('.'), 
                 message: err.message 
             }))
         });
