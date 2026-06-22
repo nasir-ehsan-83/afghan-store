@@ -1,27 +1,41 @@
 import mongoose from "mongoose";
 
-const userSchema = mongoose.Schema({
+// Define the User Schema
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
+        required: [true, "Name is required"],
+        // Removes unnecessary whitespace
+        trim: true 
     },
     username: {
         type: String,
-        required: true,
-        unique: true 
+        required: [true, "Username is required"],
+        unique: true,
+        trim: true,
+        // Ensures  that"Admin" and "admin" are treated as the same
+        lowercase: true 
     },
     email: {
         type: String,
-        required: true,
-        unique: true
+        required: [true, "Email is required"],
+        unique: true,
+        trim: true,
+        lowercase: true,
+        // Basic regex for email validation
+        match: [/^[\w-\]+@([\w-]+\.)+[\w-]{2,4}$/, "Please enter a valid email address"]
     },
     password: {
         type: String,
-        required: true
+        required: [true, "Password is required"]
     },
-    refresh_token: String
+    refresh_token: {
+        type: String,
+        default: null 
+    }
 }, {
-    timestamps: true 
+    timestamps: true // Automatically adds createdAt and updatedAt fields
 });
 
-export const UserModel =  mongoose.model("User", userSchema);
+
+export const UserModel = mongoose.model("User", userSchema);
