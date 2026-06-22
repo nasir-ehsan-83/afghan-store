@@ -3,6 +3,7 @@ import cors from "cors";
 
 import { errorHandler } from "./middlewares/error.handler.middleware";
 import authRoutes from "./routes/auth.routes";
+import refreshRoute from "./routes/refresh.route";
 
 // create express's object
 const app = express();
@@ -18,7 +19,9 @@ app.use(express.json());
 // add error-handler middleware
 app.use(errorHandler);
 
+// add routes from src/routes/*
 app.use("/api/auth", authRoutes);
+app.use("/api/refresh", refreshRoute);
 
 // if there is not provided api
 app.use((req, res)=> {
