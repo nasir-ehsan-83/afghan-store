@@ -3,39 +3,6 @@ import jwt from "jsonwebtoken";
 import { UserModel } from "../models/user.model.js"; 
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-export const registerUser = asyncHandler(async (req, res) => {
-    // Extract user details from request body
-    const { name, username, email, password } = req.body; 
-
-    // Check if user already exists (database query)
-    const userExist = await UserModel.exists({ 
-        $or: [{ email }, { username }] 
-    }); 
-
-    if (userExist) { 
-        // Custom error for the global handler
-        const error = new Error("User already exists!");
-        error.statusCode = 400;
-        throw error;
-    } 
-
-    // Hash password securely
-    const hashPassword = await bcrypt.hash(password, 10); 
-
-    // Create record
-    await UserModel.create({ 
-        name, 
-        username, 
-        email, 
-        password: hashPassword 
-    }); 
-
-    return res.status(201).json({ 
-        success: true, 
-        message: "User registered successfully" 
-    }); 
-}); 
-
 export const handleLoginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body; 
 
