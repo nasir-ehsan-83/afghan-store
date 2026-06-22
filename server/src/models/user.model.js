@@ -18,7 +18,8 @@ const userSchema = mongoose.Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    refresh_token: String
 }, {
     timestamps: true 
 });
