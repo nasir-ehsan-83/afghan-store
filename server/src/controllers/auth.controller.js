@@ -1,127 +1,96 @@
-import { UserModel } from "../models/user.model"; 
 import bcrypt from "bcryptjs"; 
 import jwt from "jsonwebtoken"; 
+import { UserModel } from "../models/user.model.js"; 
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-// Handle user registration
-export const registerUser = async (req, res) => { 
-    try {
-        // Extract user details from request body
-        const { name, username, email, password } = req.body; 
+export const registerUser = asyncHandler(async (req, res) => {
+    // Extract user details from request body
+    const { name, username, email, password } = req.body; 
 
-        // Check if user already exists by email or username using $or array structure
-        const userExist = await UserModel.exists({ 
-            $or: [{ email }, { username }] 
-        }); 
+    // Check if user already exists (database query)
+    const userExist = await UserModel.exists({ 
+        $or: [{ email }, { username }] 
+    }); 
 
-        // Return error and stop execution if user already exists
-        if (userExist) { 
-            return res.status(400).json({ 
-                status: "error", 
-                message: "User already exists!" 
-            }); 
-        } 
+    if (userExist) { 
+        // Custom error for the global handler
+        const error = new Error("User already exists!");
+        error.statusCode = 400;
+        throw error;
+    } 
 
-        // Hash the password securely using bcrypt
-        const hashPassword = await bcrypt.hash(password, 10); 
+    // Hash password securely
+    const hashPassword = await bcrypt.hash(password, 10); 
 
-        // Create new user record in the database
-        await UserModel.create({ 
-            name, 
-            username, 
-            email, 
-            password: hashPassword 
-        }); 
+    // Create record
+    await UserModel.create({ 
+        name, 
+        username, 
+        email, 
+        password: hashPassword 
+    }); 
 
-        return res.status(200).json({ 
-            success: true, 
-            message: "User registered successfully" 
-        }); 
-    
-    } catch (error) {
-        // Handle server errors
-        return res.status(500).json({ 
-            status: "error", 
-            message: error.message 
-        });
-    }
-}; 
+    return res.status(201).json({ 
+        success: true, 
+        message: "User registered successfully" 
+    }); 
+}); 
 
-// Handle user login
-export const loginUser = async (req, res) => { 
-    try {
-        // Extract credentials from request body
-        const { username, password } = req.body; 
+export const loginUser = asyncHandler(async (req, res) => {
+    const { username, password } = req.body; 
 
-        // Find user by their username
-        const user = await UserModel.findOne({ username }); 
+    // Find user
+    const user = await UserModel.findOne({ username }); 
 
-        // Return error if user does not exist
-        if (!user) { 
-            return res.status(404).json({ 
-                status: "error", 
-                message: "User does not exist!" 
-            }); 
-        } 
+    if (!user) { 
+        const error = new Error("Invalid credentials: User does not exist");
+        error.statusCode = 404;
+        throw error;
+    } 
 
-        // Compare the provided password with the hashed password in database
-        const passwordMatch = await bcrypt.compare(password, user.password); 
+    // Compare passwords
+    const passwordMatch = await bcrypt.compare(password, user.password); 
 
-        // Return error if passwords do not match
-        if (!passwordMatch) { 
-            return res.status(400).json({ 
-                status: "error", 
-                message: "Password is not correct" 
-            }); 
-        } 
+    if (!passwordMatch) { 
+        const error = new Error("Invalid credentials: Correct password required");
+        error.statusCode = 401;
+        throw error;
+    } 
 
-        // Generate short-lived access token
-        const accessToken = jwt.sign( 
-            { 
-                "id": user._id, 
-                "name": user.name, 
-                "username": user.username, 
-                "email": user.email 
-            }, 
-            process.env.ACCESS_TOKEN_SECRET_KEY, 
-            { expiresIn: "100s" } 
-        ); 
+    // Token Payload
+    const userPayload = { 
+        id: user._id, 
+        name: user.name, 
+        username: user.username, 
+        email: user.email 
+    };
 
-        // Generate long-lived refresh token
-        const refreshToken = jwt.sign( 
-            { 
-                "id": user._id, 
-                "name": user.name, 
-                "username": user.username, 
-                "email": user.email 
-            }, 
-            process.env.REFRESH_TOKEN_SECRET_KEY, 
-            { expiresIn: "1d" } 
-        ); 
+    // Generate Tokens
+    const accessToken = jwt.sign( 
+        userPayload, 
+        process.env.ACCESS_TOKEN_SECRET_KEY, 
+        { expiresIn: "15m" } // Changed from 100s to 15m for better UX
+    ); 
 
-        // Store the refresh token in the database for session validation
-        await UserModel.updateOne(
-            { _id: user._id }, 
-            { "refresh_token": refreshToken }
-        ); 
+    const refreshToken = jwt.sign( 
+        userPayload, 
+        process.env.REFRESH_TOKEN_SECRET_KEY, 
+        { expiresIn: "1d" } 
+    ); 
 
-        // Send refresh token as a secure httpOnly cookie (valid for 24 hours)
-        res.cookie( 
-            "jwt", 
-            refreshToken, 
-            { 
-                httpOnly: true, 
-                maxAge: 24 * 60 * 60 * 1000 
-            } 
-        ); 
+    // Save Refresh Token to DB
+    await UserModel.updateOne(
+        { _id: user._id }, 
+        { refresh_token: refreshToken }
+    ); 
 
-        // Send access token back as JSON response
-        return res.json({ accessToken }); 
-    
-    } catch (error) {
-        // Handle server errors
-        return res.status(500).json({ 
-            status: "error", 
-            message: error.message 
-        });
-    }
-}
+    // Set secure cookie
+    res.cookie("jwt", refreshToken, { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === "production", // Secure in production
+        sameSite: "Strict",
+        maxAge: 24 * 60 * 60 * 1000 
+    }); 
+
+    return res.json({ accessToken }); 
+});
