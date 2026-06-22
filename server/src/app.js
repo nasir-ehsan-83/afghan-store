@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 
+import { errorHandler } from "./middlewares/error.handler.middleware";
 import authRoutes from "./routes/auth.routes";
 
 // create express's object
@@ -13,6 +14,9 @@ app.use(cors({
 
 // use json () to parse json files
 app.use(express.json());
+
+// add error-handler middleware
+app.use(errorHandler);
 
 app.use("/api/auth", authRoutes);
 
