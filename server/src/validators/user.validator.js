@@ -8,3 +8,19 @@ export const createUserSchema = z.object({
         password: z.string().min(8, "Password length should not be less than 8")
     })
 });
+
+export const userResponseSchema = z.object({
+    _id: z.any(), // to get mongo's ObjectId
+    name: z.string(),
+    username: z.string(),
+    email: z.string().email(),
+}).transform((data) => ({
+    id: data._id.toString(), // convert mongo's ObjectId to string
+    name: data.name,
+    username: data.username,
+    email: data.email
+}));
+
+export const allUsersResponseSchema = z.object({
+    users: z.array(userResponseSchema)
+});
