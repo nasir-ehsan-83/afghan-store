@@ -35,3 +35,31 @@ export const createUser = asyncHandler(async (req, res) => {
         message: "User registered successfully" 
     }); 
 }); 
+
+export const getUser = asyncHandler(async (req, res) => {
+   // get user from database
+    const foundUser = await UserModel.findOne({
+        _id: req.user.id
+    });
+
+   // if user not found
+    if (!foundUser) {
+        return res.status(404).json({
+            status: "error",
+            message: "User not found"
+        });
+    }
+
+    return res.status(200).json({
+        user: foundUser
+    })
+});
+
+export const getAllUsers = asyncHandler(async (req, res) => {
+    // get all users from database
+    const foundUsers = await UserModel.findAll().toList();
+
+    return res.status(200).json({
+        users: foundUsers
+    });
+});
