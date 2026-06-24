@@ -24,3 +24,17 @@ export const userResponseSchema = z.object({
 export const allUsersResponseSchema = z.object({
     users: z.array(userResponseSchema)
 });
+
+export const updateUserSchema = z.object({
+    params: z.strictObject({
+        // to verify mongo ObjectId
+        id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid User ID format")
+    }),
+    
+    body: z.strictObject({
+        name: z.string().min(3, "Name's length should not be less than 3"),
+        username: z.string().min(3, "Username's length should not be less than 3"),
+        email: z.string().email("Invalid email format").min(10),
+        password: z.string().min(8, "Password length should not be less than 8")
+    }).partial() // use partial to make fields optional
+});
