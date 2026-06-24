@@ -26,11 +26,6 @@ export const allUsersResponseSchema = z.object({
 });
 
 export const updateUserSchema = z.object({
-    params: z.strictObject({
-        // to verify mongo ObjectId
-        id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid User ID format")
-    }),
-    
     body: z.strictObject({
         name: z.string().min(3, "Name's length should not be less than 3"),
         username: z.string().min(3, "Username's length should not be less than 3"),

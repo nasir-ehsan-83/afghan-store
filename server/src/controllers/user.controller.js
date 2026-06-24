@@ -38,9 +38,7 @@ export const createUser = asyncHandler(async (req, res) => {
 
 export const getUser = asyncHandler(async (req, res) => {
    // get user from database
-    const foundUser = await UserModel.findOne({
-        _id: req.user.id
-    });
+    const foundUser = await UserModel.findById(req.params.id);
 
    // if user not found
     if (!foundUser) {
@@ -50,16 +48,52 @@ export const getUser = asyncHandler(async (req, res) => {
         });
     }
 
-    return res.status(200).json({
-        user: foundUser
-    })
+    // Return exact object to match userResponseSchema
+    return res.status(200).json(foundUser);
 });
 
 export const getAllUsers = asyncHandler(async (req, res) => {
     // get all users from database
-    const foundUsers = await UserModel.findAll().toList();
+    const foundUsers = await UserModel.find({});
 
     return res.status(200).json({
         users: foundUsers
     });
+});
+
+
+export const updateUser = asyncHandler(async (req, res) => {
+    const id = req.user.id;
+
+    // get user from DB
+    const foundUser = await UserModel.findOne({
+        _id: id
+    });
+
+    // if user does not exist
+    if (!foundUser) {
+        return res.status(404).json({
+            status: "error",
+            message: "User not found"
+        });
+    }
+
+    const { name, username, email, password } = req.body;
+
+    // fields to be updated
+    const updateData = {name, username, email};
+
+    // if user is updated
+    if (password) {
+        updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    // update user 
+    const updateUser = await UserModel.findByIdAndUpdate(
+        id,
+        { $set: updateData },
+        { new: true }
+    );
+
+    return res.status(200).json(updateUser);
 });
