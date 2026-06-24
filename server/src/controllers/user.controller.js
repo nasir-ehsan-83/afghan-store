@@ -97,3 +97,32 @@ export const updateUser = asyncHandler(async (req, res) => {
 
     return res.status(200).json(updateUser);
 });
+
+export const deleteUser = asyncHandler(async (req, res) => {
+    const id = req.user.id;
+
+    // delete user directly from DB
+    const deletedUser = await UserModel.findByIdAndDelete(id);
+
+    // if user does not exist in DB
+    if (!deletedUser) {
+        return res.status(404).json({
+            status: "error",
+            message: "User not found"
+        });
+    }
+     
+    // clear jwt-token from cookies after deletting user 
+    res.clearCookie(
+        "jwt", { 
+            httpOnly: true, 
+            sameSite: "None", 
+            secure: true 
+        }
+    );
+
+
+    return res.status(200).json({
+        message: "User deleted"
+    });
+});

@@ -14,7 +14,8 @@ import {
     createUser,
     getUser,
     getAllUsers,
-    updateUser
+    updateUser,
+    deleteUser
 } from "../controllers/user.controller.js";
 
 const router = Router();
@@ -26,5 +27,6 @@ router.use(getCurrentUser);
 router.get("/:id", checkRole(["ADMIN", "USER"]), validateResponse(userResponseSchema), getUser);
 router.get("/", checkRole(["ADMIN"]), validateResponse(allUsersResponseSchema), getAllUsers);
 router.patch("/", checkRole(["USER"]), validateRequest(updateUserSchema), validateResponse(userResponseSchema), updateUser);
+router.delete("/", checkRole(["USER"]), deleteUser);
 
 export default router;
