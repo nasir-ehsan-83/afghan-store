@@ -7,20 +7,25 @@ import { getCurrentUser } from "../middlewares/current.user.middleware.js";
 import { 
     createProductSchema,
     productResponseSchema,
-    allProductsResponseSchema
+    allProductsResponseSchema,
+    updateProductSchema
 } from "../validators/product.validator.js";
 import { 
     createProduct ,
     getProduct,
-    getAllProducts
+    getAllProducts,
+    updateProduct,
+    deleteProduct
 } from "../controllers/product.controller";
 
 const router = Router();
 
 router.use(getCurrentUser, checkRole(["ADMIN"]));
 
-router.post("/", validateRequest(createProductSchema), validateResponse(productResponseSchema), createProduct)
+router.post("/", validateRequest(createProductSchema), validateResponse(productResponseSchema), createProduct);
 router.get("/:id", validateResponse(productResponseSchema), getProduct);
 router.get("/", validateResponse(allProductsResponseSchema), getAllProducts);
+router.patch("/:id", validateRequest(updateProductSchema), validateResponse(createProductSchema), updateProduct);
+router.delete("/:id", deleteProduct);
 
 export default router;

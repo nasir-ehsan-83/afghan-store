@@ -33,7 +33,7 @@ export const allProductsResponseSchema = z.object({
     users: z.array(productResponseSchema)
 });
 
-export const productUpdateSchema = z.object({
+export const updateProductSchema = z.object({
     body: z.strictObject({
         name: z.string(),
         description: z.string().partial(),
