@@ -28,3 +28,7 @@ export const productResponseSchema = z.object({
     imageURL: data.imageURL,
     stock: data.stock
 }));
+
+export const allProductsResponseSchema = z.object({
+    users: z.array(productResponseSchema)
+});
