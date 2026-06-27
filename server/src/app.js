@@ -7,31 +7,28 @@ import refreshRoute from "./routes/refresh.route.js";
 import usersRoutes from "./routes/user.routes.js";
 import productRoute from "./routes/product.routes.js";
 
-// create express's object
 const app = express();
 
-// use cors to presmision differint host to connect
 app.use(cors({
-    origin : ["http://localhost:3500", "http://127.0.0.1:3500", "https://www.google.com"]
+    origin : [
+        "http://localhost:5173", 
+        "http://127.0.0.1:5173"
+    ]
 }));
 
-// use json () to parse json files
 app.use(express.json());
 
-// add error-handler middleware
-app.use(errorHandler);
-
-// add routes from src/routes/*
 app.use("/api/auth", authRoutes);
 app.use("/api/refresh", refreshRoute);
 app.use("/api/users", usersRoutes);
 app.use("/api/products", productRoute);
 
-// if there is not provided api
 app.use((req, res)=> {
-    res.status(404).json({
+    return res.status(404).json({
         error : "Route not found"
     });
 });
+
+app.use(errorHandler);
 
 export default app;
