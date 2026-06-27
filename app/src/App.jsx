@@ -1,19 +1,26 @@
-function App() {
-  return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
-      <div className="bg-white p-8 rounded-xl shadow-md text-center">
-        <h1 className="text-3xl font-bold text-blue-600 mb-2">
-          Your E-Commerce
-        </h1>
-        <p className="text-gray-600">
-          Wellcome to Your E-Commerce
-        </p>
-        <button className="mt-4 px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition">
-          Cehck Button
-        </button>
-      </div>
-    </div>
-  )
+import { createBrowserRouter, RouterProvider } from "react-router";
+
+import Home from "./pages/Home.jsx";
+import Login from "./pages/Login.jsx";
+import ProductDetails from "./pages/ProductDetails.jsx";
+import Signup from "./pages/Signup.jsx";
+import AddProduct from "./admin/AddProduct.jsx";
+import EditProduct from "./admin/EditProduct.jsx";
+import ProductList from "./admin/ProductList.jsx";
+
+const router = createBrowserRouter([
+  {path: "/", element: <Home/>},
+  {path: "/login", element: <Login/>},
+  {path: "/product/:id", element: <ProductDetails/>},
+  {path: "/signup", element: <Signup/>},
+
+  {path: "/admin/products", element: <ProductList/>},
+  {path: "/admin/products/add", element: <AddProduct/>},
+  {path: "/admin/products/update/:id", element: <EditProduct/>},
+]);
+
+const App = () => {
+  return <RouterProvider router = {router}/>;
 }
 
 export default App
