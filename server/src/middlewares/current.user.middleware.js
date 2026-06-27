@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
 import { asyncHandler } from "../utils/async.handler.js";
+import { UserModel } from "../models/user.model.js";
 
 export const getCurrentUser = asyncHandler(async (req, res, next) => {
     const authHeader = req.headers.authorization || req.headers.Authorization;
 
-    // Check for Authorization header and Bearer prefix
     if (!authHeader?.startsWith("Bearer ")) {
         const error = new Error("Unauthorized: No token provided");
         error.statusCode = 401;
@@ -13,20 +13,23 @@ export const getCurrentUser = asyncHandler(async (req, res, next) => {
 
     const token = authHeader.split(' ')[1];
 
-    jwt.verify(
-        token,
-        process.env.ACCESS_TOKEN_SECRET_KEY,
-        (err, decoded) => {
-            if (err) {
-                return res.status(403).json({ 
-                    status: "error", 
-                    message: "Forbidden: Invalid or expired token" 
-                });
-            }
-
-            req.user = decoded;
-            
-            next();
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
+        
+        const userExists = await UserModel.findById(decoded.id);
+        
+        if (!userExists) {
+            const error = new Error("Unauthorized: User account no longer exists");
+            error.statusCode = 401;
+            throw error;
         }
-    );
+
+        req.user = decoded;
+        return next();
+
+    } catch (err) {
+        const error = new Error("Forbidden: Invalid or expired token");
+        error.statusCode = 403;
+        throw error;
+    }
 });
