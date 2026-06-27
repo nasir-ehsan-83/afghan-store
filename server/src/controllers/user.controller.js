@@ -5,7 +5,7 @@ import { asyncHandler } from "../utils/async.handler.js";
 
 export const createUser = asyncHandler(async (req, res) => {
     // Extract user details from request body
-    const { name, username, email, password } = req.body; 
+    const { name, username, email, password, role } = req.body; 
 
     // Check if user already exists 
     const userExist = await UserModel.exists({ 
@@ -27,7 +27,8 @@ export const createUser = asyncHandler(async (req, res) => {
         name, 
         username, 
         email, 
-        password: hashPassword 
+        password: hashPassword,
+        role
     }); 
 
     return res.status(201).json({ 

@@ -8,7 +8,8 @@ import {
     createUserSchema,
     userResponseSchema,
     allUsersResponseSchema,
-    updateUserSchema
+    updateUserSchema,
+    getUserParamsSchema
 } from "../validators/user.validator.js";
 import { 
     createUser,
@@ -24,9 +25,9 @@ router.post("/", validateRequest(createUserSchema), createUser);
 
 router.use(getCurrentUser);
 
-router.get("/:id", checkRole(["ADMIN", "USER"]), validateResponse(userResponseSchema), getUser);
+router.get("/:id", checkRole(["ADMIN", "USER"]), validateRequest(getUserParamsSchema), validateResponse(userResponseSchema), getUser);
 router.get("/", checkRole(["ADMIN"]), validateResponse(allUsersResponseSchema), getAllUsers);
-router.patch("/", checkRole(["USER"]), validateRequest(updateUserSchema), validateResponse(userResponseSchema), updateUser);
-router.delete("/", checkRole(["USER"]), deleteUser);
+router.patch("/", checkRole(["USER", "ADMIN"]), validateRequest(updateUserSchema), validateResponse(userResponseSchema), updateUser);
+router.delete("/", checkRole(["USER", "ADMIN"]), deleteUser);
 
 export default router;
