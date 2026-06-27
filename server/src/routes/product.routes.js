@@ -18,14 +18,40 @@ import {
     deleteProduct
 } from "../controllers/product.controller.js";
 
+
+
+
 const router = Router();
 
-router.use(getCurrentUser, checkRole(["ADMIN"]));
-
-router.post("/", validateRequest(createProductSchema), validateResponse(productResponseSchema), createProduct);
-router.get("/:id", validateResponse(productResponseSchema), getProduct);
-router.get("/", validateResponse(allProductsResponseSchema), getAllProducts);
-router.patch("/:id", validateRequest(updateProductSchema), validateResponse(createProductSchema), updateProduct);
-router.delete("/:id", deleteProduct);
+router.get(
+    "/:id", 
+    validateResponse(productResponseSchema), 
+    getProduct
+);
+router.get(
+    "/", 
+    validateResponse(allProductsResponseSchema), 
+    getAllProducts
+);
+router.use(
+    getCurrentUser, 
+    checkRole(["ADMIN"])
+);
+router.post(
+    "/", 
+    validateRequest(createProductSchema), 
+    validateResponse(productResponseSchema), 
+    createProduct
+);
+router.patch(
+    "/:id", 
+    validateRequest(updateProductSchema), 
+    validateResponse(productResponseSchema), 
+    updateProduct
+);
+router.delete(
+    "/:id", 
+    deleteProduct
+);
 
 export default router;
