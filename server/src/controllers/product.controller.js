@@ -30,7 +30,22 @@ export const getProduct = asyncHandler(async (req, res) => {
 });
 
 export const getAllProducts = asyncHandler(async (req, res) => {
-    const products = await ProductModel.find().sort({createdAt: -1});
+    // get search and category filtering
+    const { search, category } = req.query;
+
+    // filter options
+    const filter = {};
+
+    if (search) {
+        filter.name = {$regex: search, $options: 'i'};
+    }
+
+    if (category) {
+        filter.category = category;
+    }
+
+    const products = await ProductModel.find(filter).sort({createdAt: -1});
+
     return res.status(200).json(products);
 });
 
