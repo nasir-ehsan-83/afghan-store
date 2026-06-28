@@ -16,7 +16,7 @@ export const createUserSchema = z.object({
 });
 
 export const userResponseSchema = z.object({
-    _id: z.union([z.string(), z.object({ toString: z.function().returns(z.string()) })]),
+    _id: z.any(),
     username: z.string(),
     email: z.string().email(),
     role: z.string()

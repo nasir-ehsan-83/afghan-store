@@ -12,15 +12,17 @@ export const createProductSchema = z.object({
 });
 
 export const productResponseSchema = z.object({
-    _id: z.union([z.string(), z.object({ toString: z.function().returns(z.string()) })]),
+    _id: z.any(),
     name: z.string(),
     description: z.string().nullable().optional(),
     price: z.number(),
     category: z.string(),
     imageURL: z.string(),
     stock: z.number()
-}).transform((data) => ({
-    id: data._id.toString(),
+})
+.strip() 
+.transform((data) => ({
+    id: data._id ? data._id.toString() : "",
     name: data.name,
     description: data.description || "", 
     price: data.price,
@@ -29,9 +31,7 @@ export const productResponseSchema = z.object({
     stock: data.stock
 }));
 
-export const allProductsResponseSchema = z.object({
-    products: z.array(productResponseSchema)
-});
+export const allProductsResponseSchema = z.array(productResponseSchema);
 
 export const updateProductSchema = z.object({
     body: z.strictObject({
