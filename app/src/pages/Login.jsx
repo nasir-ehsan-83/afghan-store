@@ -1,7 +1,18 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { 
+  useNavigate, 
+  Link 
+} from "react-router";
+import { 
+  User, 
+  Lock, 
+  LogIn, 
+  AlertCircle, 
+  CheckCircle2, 
+  Eye, 
+  EyeOff 
+} from "lucide-react";
 import { api } from "../api/axios.js";
-import { User, Lock, LogIn, AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -17,14 +28,22 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/auth/login", form);
+      const response = await api.post("/auth/login", form);
+      
+      // ذخیره توکن دریافتی از سرور برای احراز هویت در روت‌های بعدی
+      if (response.data?.accessToken) {
+        localStorage.setItem("accessToken", response.data.accessToken);
+      }
+
       setIsError(false);
       setMsg("Login successful");
+      
       setTimeout(() => {
         navigate("/");
       }, 1000);
     } catch (err) {
       setIsError(true);
+      // نمایش دقیق پیام خطای صادر شده از سمت بک‌اَند
       setMsg(err.response?.data?.message || "An error occurred");
     }
   };

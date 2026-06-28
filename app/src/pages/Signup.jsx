@@ -1,7 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { 
+    Link, 
+    useNavigate 
+} from "react-router";
+import { 
+    User, 
+    AtSign, 
+    Lock, 
+    AlertCircle, 
+    CheckCircle2, 
+    Eye, 
+    EyeOff 
+} from "lucide-react";
 import { api } from "../api/axios.js";
-import { User, AtSign, Lock, UserPlus, AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react";
 
 const Signup = () => {
     const [form, setForm] = useState({
@@ -16,6 +27,8 @@ const Signup = () => {
     const [isError, setIsError] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    
+    const navigate = useNavigate();
 
     const handleChanges = (e) => {
         setForm({
@@ -26,23 +39,39 @@ const Signup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
         if (form.password !== form.confirmPassword) {
             setIsError(true);
             setMsg("Passwords do not match");
             return;
         }
+        
         try {
             const response = await api.post("/users", {
                 name: form.name,
                 username: form.username,
                 email: form.email,
-                password: form.password
+                password: form.password,
+                role: "ADMIN"
             });
+            
             setIsError(false);
             setMsg(response.data.message || "Registration successful!");
+            
+            setTimeout(() => {
+                navigate("/login");
+            }, 1500);
+            
         } catch (error) {
             setIsError(true);
-            setMsg(error.response?.data?.message || "An error occurred");
+            
+            const serverErrors = error.response?.data?.errors;
+            
+            if (serverErrors && Array.isArray(serverErrors) && serverErrors.length > 0) {
+                setMsg(`${serverErrors[0].field}: ${serverErrors[0].message}`);
+            } else {
+                setMsg(error.response?.data?.message || "An error occurred");
+            }
         }
     };
 
@@ -53,10 +82,10 @@ const Signup = () => {
                 <div className="mb-10 text-center flex flex-col items-center">
                     <div className="mb-6 relative w-36 h-36 flex items-center justify-center">
                         <svg className="w-36 h-36 text-blue-600" viewBox="0 0 100 100" fill="none" xmlns="http://w3.org">
-                        <path d="M10 20 H25 L34 52 H80 C84 52, 86 54, 86 58 C86 62, 84 64, 80 64 H18 C14 64, 12 62, 12 58" stroke="currentColor" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M30 26 H88 L80 52" stroke="currentColor" strokeWidth="6.5" fill="currentColor" fillOpacity="0.12" strokeLinecap="round" strokeLinejoin="round"/>
-                        <circle cx="34" cy="80" r="8" fill="currentColor" fillOpacity="0.5"/>
-                        <circle cx="70" cy="80" r="8" fill="currentColor" fillOpacity="0.5"/>
+                            <path d="M10 20 H25 L34 52 H80 C84 52, 86 54, 86 58 C86 62, 84 64, 80 64 H18 C14 64, 12 62, 12 58" stroke="currentColor" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M30 26 H88 L80 52" stroke="currentColor" strokeWidth="6.5" fill="currentColor" fillOpacity="0.12" strokeLinecap="round" strokeLinejoin="round"/>
+                            <circle cx="34" cy="80" r="8" fill="currentColor" fillOpacity="0.5"/>
+                            <circle cx="70" cy="80" r="8" fill="currentColor" fillOpacity="0.5"/>
                         </svg>
                     </div>
                     
@@ -157,17 +186,19 @@ const Signup = () => {
                         type="submit"
                         className="w-full mt-2 bg-blue-600 text-white py-3.5 px-4 rounded-xl font-semibold shadow-lg shadow-blue-100 hover:bg-blue-700 hover:shadow-blue-200 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2"
                     >
-                        <UserPlus className="w-5 h-5" />
-                        Sign Up
+                        <span>Sign Up</span>
                     </button>
                 </form>
 
-                <p className="mt-6 text-center text-sm text-slate-600">
+                <div className="mt-6 text-center text-sm text-slate-500">
                     Already have an account?{" "}
-                    <Link to="/login" className="text-blue-600 font-semibold hover:text-blue-800 hover:underline transition-colors">
+                    <Link 
+                        to="/login" 
+                        className="font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-all"
+                    >
                         Sign In
                     </Link>
-                </p>
+                </div>
             </div>
         </div>
     );

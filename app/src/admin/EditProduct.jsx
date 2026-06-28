@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 const EditProduct = () => {
-  const { id } = useParams(); // اصلاح باگ: فراخوانی به صورت تابع ()
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -50,7 +50,6 @@ const EditProduct = () => {
     description: <FileText className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
   };
 
-  // لود کردن دیتای کالا به صورت مستقیم و بهینه از بک‌اَند
   useEffect(() => {
     const loadProduct = async () => {
       try {
@@ -66,7 +65,8 @@ const EditProduct = () => {
           imageURL: product.imageURL || "",
           description: product.description || ""
         });
-        setError("");
+        setIsError(false);
+        setMsg("");
       } catch (err) {
         setIsError(true);
         setMsg(err.response?.data?.message || "Failed to load product details");
@@ -87,25 +87,45 @@ const EditProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     try {
-      await api.patch(`/products/${id}`, form);
+      const formattedPayload = {
+        name: form.name.trim(),
+        category: form.category.trim(),
+        price: form.price ? Number(form.price) : 0,
+        imageURL: form.imageURL.trim(),
+        ...(form.description ? { description: form.description.trim() } : {}),
+        stock: form.stock ? parseInt(form.stock, 10) : 0
+      };
+
+      await api.patch(`/products/${id}`, formattedPayload);
+      
       setIsError(false);
       setMsg("Product updated successfully!");
+      
       setTimeout(() => {
         navigate("/admin/products");
       }, 1000);
+      
     } catch (err) {
       setIsError(true);
-      setMsg(err.response?.data?.message || "Failed to update product");
+      
+      const serverErrors = err.response?.data?.errors;
+      
+      if (serverErrors && Array.isArray(serverErrors) && serverErrors.length > 0) {
+        const primaryError = serverErrors[0];
+        const fieldName = primaryError.path ? primaryError.path[primaryError.path.length - 1] : "Field";
+        setMsg(`${fieldName}: ${primaryError.message}`);
+      } else {
+        setMsg(err.response?.data?.message || "Validation failed. Please verify all numeric fields.");
+      }
     }
   };
 
   return (
     <div className="flex justify-center min-h-screen bg-slate-50 px-4 antialiased py-12">
-      {/* عرض بزرگ تعمیم‌یافته به صورت گرید منظم دو ستونه */}
       <div className="w-full max-w-3xl bg-white p-8 rounded-2xl shadow-xl shadow-slate-100 border border-slate-100 h-fit">
         
-        {/* هدر افقی با دکمه بازگشت مینی‌مال سمت راست */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 mb-8 border-b border-slate-200/60">
           <div className="text-left">
             <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Edit Product</h1>
@@ -123,7 +143,6 @@ const EditProduct = () => {
           </div>
         </div>
 
-        {/* لایه وضعیت انتظار لود شدن دیتای قبلی */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16 text-slate-500 gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
@@ -141,7 +160,6 @@ const EditProduct = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* گرید بندی جدولی برای تراز فیلدها دقیقا مشابه با فرم ساخت */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 
                 {Object.keys(form).map((key) => {
@@ -180,7 +198,6 @@ const EditProduct = () => {
 
               </div>
 
-              {/* دکمه به‌روزرسانی هماهنگ با استایل آیکون مینی‌مال */}
               <div className="pt-2 border-t border-slate-100 mt-6 flex justify-end">
                 <button
                   type="submit"

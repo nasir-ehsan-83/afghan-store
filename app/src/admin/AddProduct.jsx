@@ -52,20 +52,48 @@ const AddProduct = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await api.post("/products", form);
-      setIsError(false);
-      setMsg("Product added successfully");
-      setTimeout(() => {
-        navigate("/admin/products");
-      }, 1000);
-    } catch (err) {
-      setIsError(true);
-      setMsg(err.response?.data?.message || "Failed to add product");
-    }
-  };
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      
+      try {
+        // 1. Clean data formatting to prevent NaN values from passing to Zod strictObject
+        const formattedPayload = {
+          name: form.name.trim(),
+          category: form.category.trim(),
+          price: form.price ? Number(form.price) : 0,
+          imageURL: form.imageURL.trim(),
+          // Only include optional description if it has characters
+          ...(form.description ? { description: form.description.trim() } : {}),
+          // Ensure stock defaults to a proper integer number
+          stock: form.stock ? parseInt(form.stock, 10) : 0
+        };
+
+        await api.post("/products", formattedPayload);
+        
+        setIsError(false);
+        setMsg("Product added successfully!");
+        
+        setTimeout(() => {
+          navigate("/admin/products");
+        }, 1000);
+        
+      } catch (err) {
+        setIsError(true);
+        
+        const serverErrors = err.response?.data?.errors;
+        
+        // 2. Correct mapping for standard Zod array structures (path vs field)
+        if (serverErrors && Array.isArray(serverErrors) && serverErrors.length > 0) {
+          const primaryError = serverErrors[0];
+          const fieldName = primaryError.path ? primaryError.path[primaryError.path.length - 1] : "Field";
+          setMsg(`${fieldName}: ${primaryError.message}`);
+        } else {
+          setMsg(err.response?.data?.message || "Validation failed. Please verify all numeric fields.");
+        }
+      }
+    };
+
+
 
   return (
     <div className="flex justify-center min-h-screen bg-slate-50 px-4 antialiased py-12">
