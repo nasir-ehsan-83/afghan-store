@@ -1,4 +1,4 @@
-# 🛒 Your Ecommerce
+# 🛒 Afghan Store
 
 A modern full-stack e-commerce platform built with **React**, **Express.js**, and **MongoDB**. The project follows a scalable architecture with secure authentication, clean code practices, and a modern user experience.
 
@@ -9,11 +9,11 @@ A modern full-stack e-commerce platform built with **React**, **Express.js**, an
 ### Backend
 * Node.js
 * Express.js
-* Mongoose
+* MongoDB & Mongoose
+* Zod (Validation)
 
 ### Frontend
-* React.js
-* Vite
+* React.js (Vite)
 * Tailwind CSS
 
 ---
@@ -21,7 +21,7 @@ A modern full-stack e-commerce platform built with **React**, **Express.js**, an
 ## 📂 Project Structure
 
 ```text
-your-ecommerce/
+afghan-store/
 │
 ├── server/
 │   ├── src/
@@ -68,42 +68,19 @@ your-ecommerce/
 
 ## ✨ Features
 
-### Authentication & Authorization
-* Role-Based Access Control (RBAC)
-* JWT Authentication
-* Refresh Token Rotation
-* Request Validation using Zod
-* Response Validation using Zod
+### Authentication & Security
+* **RBAC:** Role-Based Access Control for Users and Admins.
+* **Tokens:** JWT Authentication with Refresh Token Rotation.
+* **Cookies:** Secure, HttpOnly cookie handling.
+* **Hashing:** Secure password hashing with Bcrypt.
+* **Validation:** Strict input and output data validation via Zod.
+* **Error Handling:** Centralized asynchronous error handling middleware.
 
-### Products
-* Product CRUD Operations
-* Product Categories
-* Advanced Search & Filtering
-* Pagination
-
-### Orders & Shopping Cart
-* Dynamic Shopping Cart
-* Checkout System
-* Order History Tracking
-
-### Planned Features
-* Payment Gateway Integration
-* User Wishlist
-* Product Reviews & Ratings
-* Comprehensive Admin Dashboard
-* Email Verification System
-* Password Reset Flow
-
----
-
-## 🔒 Security
-
-* Secure Password Hashing with Bcrypt
-* Robust JWT Access & Refresh Token Management
-* Protected & Private Routes
-* Strict Input and Output Data Validation via Zod
-* Secure, HttpOnly Cookie Handling
-* Centralized Asynchronous Error Handling
+### Products & Core Logistics
+* Product CRUD operations and category management.
+* Advanced search, filtering, and pagination.
+* Dynamic shopping cart and checkout system.
+* Order history tracking.
 
 ---
 
@@ -112,7 +89,7 @@ your-ecommerce/
 ### Clone the Repository
 ```bash
 git clone https://github.com
-cd your-ecommerce
+cd afghan-store
 ```
 
 ### Backend Setup
@@ -130,23 +107,27 @@ npm run dev
 ```
 
 ---
+<!-- 
+## 🗺️ Roadmap & Future Improvements
 
-## 🧪 Future Improvements
+* [ ] Payment Gateway Integration (Safaripay, Stripe, etc.)
+* [ ] Email Verification & Password Reset Flow
+* [ ] Comprehensive Admin & Vendor Dashboard
+* [ ] User Wishlist & Product Reviews/Ratings
+* [ ] Redis Caching for High-Performance Data Retrieval
+* [ ] Elasticsearch Integration for Complex Queries
+* [ ] Docker Containerization Support
+* [ ] Real-Time User Notifications via WebSockets
 
-* Redis Caching for High-Performance Data Retrieval
-* Elasticsearch Integration for Complex Queries
-* Docker Containerization Support
-* Real-Time User Notifications
-
----
+--- -->
 
 ## 👨‍💻 Author
 
 **Nasir Ahmad Ehsan**  
-Backend Developer 
+*Backend Developer*  
 
-* GitHub: [://github.com](https://://github.com)
-* LinkedIn: [://linkedin.com](https://://linkedin.com)
+* **GitHub:** [://github.com](https://://github.com)
+* **LinkedIn:** [://linkedin.com](https://://linkedin.com)
 
 ---
 
