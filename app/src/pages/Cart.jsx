@@ -1,6 +1,20 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
+import { 
+  useState, 
+  useEffect 
+} from "react";
+import { 
+  useParams, 
+  useNavigate 
+} from "react-router";
+import { 
+  Trash2, 
+  Plus, 
+  Minus, 
+  ShoppingBag, 
+  ArrowRight, 
+  AlertCircle, 
+  Loader2 
+} from "lucide-react";
 import { api } from "../api/axios.js";
 
 const Cart = () => {
@@ -150,7 +164,6 @@ const Cart = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8 items-start">
-          {/* Cart Items List */}
           <div className="lg:col-span-2 space-y-3 sm:space-y-4">
             {items.map((item) => {
               if (!item.productId) return null;
@@ -176,7 +189,6 @@ const Cart = () => {
                   </div>
 
                   <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 w-full sm:w-auto">
-                    {/* Quantity Controls */}
                     <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl p-1 flex-shrink-0">
                       <button
                         onClick={() =>
@@ -205,12 +217,10 @@ const Cart = () => {
                       </button>
                     </div>
 
-                    {/* Item Total */}
                     <p className="font-bold text-slate-800 text-sm sm:text-base min-w-[60px] sm:min-w-[80px] text-right">
                       ${((item.productId.price || 0) * item.quantity).toFixed(2)}
                     </p>
 
-                    {/* Remove Button */}
                     <button
                       onClick={() =>
                         removeItem(item.productId._id || item.productId.id)
@@ -226,7 +236,6 @@ const Cart = () => {
             })}
           </div>
 
-          {/* Order Summary */}
           <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-xl shadow-slate-100/50 space-y-4 sm:space-y-6">
             <h2 className="text-base sm:text-lg font-bold text-slate-800 border-b border-slate-100 pb-2 sm:pb-3">
               Order Summary
@@ -249,7 +258,6 @@ const Cart = () => {
               </div>
             </div>
 
-            {/* Checkout Button */}
             <button
               onClick={() => navigate("/checkout")}
               className="w-full bg-blue-600 text-white font-bold py-3 sm:py-3.5 rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 hover:shadow-blue-200 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98] text-sm sm:text-base"
