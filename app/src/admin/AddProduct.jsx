@@ -46,80 +46,62 @@ const AddProduct = () => {
   };
 
   const handleChanges = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formattedPayload = {
+        name: form.name.trim(),
+        category: form.category.trim(),
+        price: form.price ? Number(form.price) : 0,
+        imageURL: form.imageURL.trim(),
+        ...(form.description ? { description: form.description.trim() } : {}),
+        stock: form.stock ? parseInt(form.stock, 10) : 0
+      };
+
+      await api.post("/products", formattedPayload);
+      setIsError(false);
+      setMsg("Product added successfully!");
       
-      try {
-        // 1. Clean data formatting to prevent NaN values from passing to Zod strictObject
-        const formattedPayload = {
-          name: form.name.trim(),
-          category: form.category.trim(),
-          price: form.price ? Number(form.price) : 0,
-          imageURL: form.imageURL.trim(),
-          // Only include optional description if it has characters
-          ...(form.description ? { description: form.description.trim() } : {}),
-          // Ensure stock defaults to a proper integer number
-          stock: form.stock ? parseInt(form.stock, 10) : 0
-        };
-
-        await api.post("/products", formattedPayload);
-        
-        setIsError(false);
-        setMsg("Product added successfully!");
-        
-        setTimeout(() => {
-          navigate("/admin/products");
-        }, 1000);
-        
-      } catch (err) {
-        setIsError(true);
-        
-        const serverErrors = err.response?.data?.errors;
-        
-        // 2. Correct mapping for standard Zod array structures (path vs field)
-        if (serverErrors && Array.isArray(serverErrors) && serverErrors.length > 0) {
-          const primaryError = serverErrors[0];
-          const fieldName = primaryError.path ? primaryError.path[primaryError.path.length - 1] : "Field";
-          setMsg(`${fieldName}: ${primaryError.message}`);
-        } else {
-          setMsg(err.response?.data?.message || "Validation failed. Please verify all numeric fields.");
-        }
+      setTimeout(() => {
+        navigate("/admin/products");
+      }, 1000);
+    } catch (err) {
+      setIsError(true);
+      const serverErrors = err.response?.data?.errors;
+      if (serverErrors && Array.isArray(serverErrors) && serverErrors.length > 0) {
+        const primaryError = serverErrors[0];
+        const fieldName = primaryError.path ? primaryError.path[primaryError.path.length - 1] : "Field";
+        setMsg(`${fieldName}: ${primaryError.message}`);
+      } else {
+        setMsg(err.response?.data?.message || "Validation failed. Please verify all numeric fields.");
       }
-    };
-
-
+    }
+  };
 
   return (
-    <div className="flex justify-center min-h-screen bg-slate-50 px-4 antialiased py-12">
-      {/* افزایش حداکثر عرض به max-w-3xl برای ایجاد فضای گرید دو ستونه */}
-      <div className="w-full max-w-3xl bg-white p-8 rounded-2xl shadow-xl shadow-slate-100 border border-slate-100 h-fit">
-        
-        {/* هدر افقی و مینی‌مال فرم با تراز دکمه بازگشت در سمت چپ */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 mb-8 border-b border-slate-200/60">
+    <div className="flex justify-center min-h-screen bg-slate-50 px-3 sm:px-4 antialiased py-4 sm:py-6 md:py-12">
+      <div className="w-full max-w-3xl bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-xl shadow-slate-100 border border-slate-100 h-fit mx-2 sm:mx-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 sm:pb-6 mb-4 sm:mb-6 md:mb-8 border-b border-slate-200/60 gap-3 sm:gap-4">
           <div className="text-left">
-            <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Add New Product</h1>
-            <p className="text-sm text-slate-500 mt-1.5">List a new premium item in your inventory</p>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">Add New Product</h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">List a new premium item in your inventory</p>
           </div>
-          
-          <div className="mt-4 sm:mt-0">
+          <div className="w-full sm:w-auto">
             <Link 
               to="/admin/products" 
-              className="inline-flex items-center gap-1.5 font-semibold text-slate-500 hover:text-blue-600 transition-all text-sm bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200/60 shadow-sm"
+              className="inline-flex items-center justify-center gap-1.5 font-semibold text-slate-500 hover:text-blue-600 transition-all text-sm bg-slate-50 w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-slate-200/60 shadow-sm"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>Back to Products</span>
             </Link>
           </div>
         </div>
 
         {msg && (
-          <div className={`mb-6 p-3 rounded-xl flex items-center gap-2 text-sm font-medium border animate-fade-in ${
+          <div className={`mb-4 sm:mb-5 md:mb-6 p-2.5 sm:p-3 rounded-xl flex items-center gap-2 text-xs sm:text-sm font-medium border animate-fade-in ${
             isError ? "bg-red-50 text-red-700 border-red-100" : "bg-emerald-50 text-emerald-700 border-emerald-100"
           }`}>
             {isError ? <AlertCircle className="w-4 h-4 shrink-0" /> : <CheckCircle2 className="w-4 h-4 shrink-0" />}
@@ -127,27 +109,24 @@ const AddProduct = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* ساختار گرید دو ستونه (جدولی منظم) برای تراز شدن فیلدها کنار هم */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5">
             {Object.keys(form).map((key) => {
-              // فیلد توضیحات و لینک عکس به صورت تمام‌عرض (Full Row) نمایش داده می‌شوند
               const isFullWidth = key === "description" || key === "imageURL";
-              
               return (
                 <div key={key} className={isFullWidth ? "sm:col-span-2" : "col-span-1"}>
                   <div className="relative flex items-center">
-                    {icons[key]}
-                    
+                    <div className="absolute left-3 sm:left-4">
+                      {icons[key]}
+                    </div>
                     {key === "description" ? (
                       <textarea
                         name={key}
                         placeholder={fieldLabels[key]}
                         value={form[key]}
                         onChange={handleChanges}
-                        rows={4}
-                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all duration-200 resize-none font-medium"
+                        rows={3}
+                        className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm sm:text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all duration-200 resize-none font-medium"
                         required
                       />
                     ) : (
@@ -157,7 +136,7 @@ const AddProduct = () => {
                         type={key === "price" || key === "stock" ? "number" : "text"}
                         value={form[key]}
                         onChange={handleChanges}
-                        className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all duration-200 font-medium"
+                        className="w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm sm:text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 transition-all duration-200 font-medium"
                         required={key !== "stock"}
                       />
                     )}
@@ -165,21 +144,19 @@ const AddProduct = () => {
                 </div>
               );
             })}
-
           </div>
 
-          {/* دکمه ثبت نهایی زیر بخش گرید */}
-          <div className="pt-2 border-t border-slate-100 mt-6 flex justify-end">
+          <div className="pt-3 sm:pt-4 border-t border-slate-100 mt-4 sm:mt-6">
             <button
               type="submit"
-              className="w-full sm:w-auto min-w-[160px] bg-blue-600 text-white py-3 px-6 rounded-xl font-semibold shadow-lg shadow-blue-100 hover:bg-blue-700 hover:shadow-blue-200 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto sm:float-right min-w-[140px] sm:min-w-[160px] bg-blue-600 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl font-semibold shadow-lg shadow-blue-100 hover:bg-blue-700 hover:shadow-blue-200 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
             >
-              <PlusCircle className="w-5 h-5" />
+              <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Add Product</span>
             </button>
+            <div className="clear-both"></div>
           </div>
         </form>
-
       </div>
     </div>
   );
