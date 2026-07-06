@@ -19,15 +19,41 @@ import {
     deleteUser
 } from "../controllers/user.controller.js";
 
+
+
+
 const router = Router();
 
-router.post("/", validateRequest(createUserSchema), createUser);
-
+router.post(
+    "/", 
+    validateRequest(createUserSchema), 
+    createUser
+);
 router.use(getCurrentUser);
-
-router.get("/:id", checkRole(["ADMIN", "USER"]), validateRequest(getUserParamsSchema), validateResponse(userResponseSchema), getUser);
-router.get("/", checkRole(["ADMIN"]), validateResponse(allUsersResponseSchema), getAllUsers);
-router.patch("/", checkRole(["USER", "ADMIN"]), validateRequest(updateUserSchema), validateResponse(userResponseSchema), updateUser);
-router.delete("/", checkRole(["USER", "ADMIN"]), deleteUser);
+router.get(
+    "/:id", 
+    checkRole(["ADMIN", "USER"]), 
+    validateRequest(getUserParamsSchema), 
+    validateResponse(userResponseSchema), 
+    getUser
+);
+router.get(
+    "/", 
+    checkRole(["ADMIN"]), 
+    validateResponse(allUsersResponseSchema), 
+    getAllUsers
+);
+router.patch(
+    "/", 
+    checkRole(["USER", "ADMIN"]), 
+    validateRequest(updateUserSchema), 
+    validateResponse(userResponseSchema), 
+    updateUser
+);
+router.delete(
+    "/", 
+    checkRole(["USER", "ADMIN"]), 
+    deleteUser
+);
 
 export default router;

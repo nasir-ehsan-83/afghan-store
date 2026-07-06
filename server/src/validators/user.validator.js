@@ -1,5 +1,6 @@
 import { object, z } from 'zod';
 
+// implement objectIdSchema to validate MongoDB's ObjectId 
 export const objectIdSchema = z.preprocess(
     (val) => val?.toString(), 
     z.string().regex(/^[0-9a-fA-F]{24}$/, {
@@ -26,7 +27,7 @@ export const userResponseSchema = z.object({
     username: z.string(),
     email: z.string().email(),
     role: z.string()
-})
+})  // use strip to remove unexpected fields and use transform to convert MongoDB's ObjectId to a valid string
 .strict()
 .transform((data) => ({
     id: data._id.toString(),

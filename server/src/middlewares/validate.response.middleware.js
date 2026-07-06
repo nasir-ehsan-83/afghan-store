@@ -17,5 +17,6 @@ export const validateResponse = (schema) => (req, res, next) => {
         }
     };
 
+    // if no error continue other process
     next();
 };

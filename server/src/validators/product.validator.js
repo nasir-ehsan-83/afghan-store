@@ -20,7 +20,7 @@ export const productResponseSchema = z.object({
     category: z.string(),
     imageURL: z.string(),
     stock: z.number()
-})
+})  // use strip to remove unexpected fields and use transform to convert MongoDB's ObjectId to a valid string
 .strip() 
 .transform((data) => ({
     id: data._id ? data._id.toString() : "",
@@ -42,5 +42,6 @@ export const updateProductSchema = z.object({
         category: z.string(),
         imageURL: z.string().url(),
         stock: z.number().int().nonnegative()
+        // use partial() to make all fields optional
     }).partial() 
 });

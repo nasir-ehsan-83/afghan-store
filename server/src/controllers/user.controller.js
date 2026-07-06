@@ -4,25 +4,25 @@ import { UserModel } from "../models/user.model.js";
 import { asyncHandler } from "../utils/async.handler.js";
 
 export const createUser = asyncHandler(async (req, res) => {
-    // Extract user details from request body
+    // extract user details from req.body
     const { name, username, email, password, role } = req.body; 
 
-    // Check if user already exists 
+    // check if user already exists 
     const userExist = await UserModel.exists({ 
         $or: [{ email }, { username }] 
     }); 
 
+    // if user already exist
     if (userExist) { 
-        // Custom error for the global handler
         const error = new Error("User already exists!");
         error.statusCode = 400;
         throw error;
     } 
 
-    // Hash password securely
+    // hash the password
     const hashPassword = await bcrypt.hash(password, 10); 
 
-    // Create record
+    // add new user to the DB
     await UserModel.create({ 
         name, 
         username, 
@@ -121,7 +121,6 @@ export const deleteUser = asyncHandler(async (req, res) => {
             secure: true 
         }
     );
-
 
     return res.status(200).json({
         message: "User deleted"

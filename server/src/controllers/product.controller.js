@@ -18,6 +18,7 @@ export const getProduct = asyncHandler(async (req, res) => {
     // get product from DB
     const foundProduct = await ProductModel.findById(id);
 
+    // if product does not exist
     if (!foundProduct) {
         return res.status(404).json({
             status: "error",
@@ -43,6 +44,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
         filter.category = category;
     }
 
+    // find products by filterring search and categories
     const products = await ProductModel.find(filter).sort({createdAt: -1});
 
     return res.status(200).json(products);
@@ -64,10 +66,13 @@ export const updateProduct = asyncHandler(async (req, res) => {
         });
     }
 
+    // get fields by destructuring req.body
     const { name, description, price, category, imageURL, stock } = req.body;
 
+    // store destructured fields to updateData object
     const updatedData = { name, description, price, category, imageURL, stock };
 
+    // add updateData to the DB
     const updateProduct = await ProductModel.findByIdAndUpdate(
         id,
         { $set: updatedData },
@@ -78,6 +83,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
 });
 
 export const deleteProduct = asyncHandler(async (req, res) => {
+    // get id from req.params
     const { id } = req.params;
 
     // delete product directly from DB

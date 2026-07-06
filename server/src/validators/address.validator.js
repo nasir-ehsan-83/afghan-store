@@ -31,6 +31,7 @@ export const addressResponseSchema = z.strictObject({
         state: z.string(),
         pincode: z.string()
     })
+    // use transform to convert MongoDB's ObjectId to valid string
 }).transform((data) => ({
     message: data.message,
     address: {

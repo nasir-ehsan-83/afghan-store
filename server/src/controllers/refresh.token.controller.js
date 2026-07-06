@@ -5,33 +5,38 @@ import { asyncHandler } from "../utils/async.handler.js";
 export const handleRefreshToken = asyncHandler(async (req, res) => {
     const cookies = req.cookies;
 
-    // Check if the JWT cookie exists in the request
+    // check if the JWT cookie exists in the request
     if (!cookies?.jwt) {
         return res.sendStatus(401); // Unauthorized
     }
 
-    // Extract the refresh token from cookies
+    // extract the refresh-token from cookies
     const refreshToken = cookies.jwt;
 
-    // Find the user who owns this refresh token in the database
+    // find the user who owns this refresh token in the DB
     const foundUser = await UserModel.findOne({ refresh_token: refreshToken });
 
-    // If no user matches this token, return forbidden
+    // if no user matches this token
     if (!foundUser) {
-        return res.sendStatus(403); // Forbidden
+        return res.sendStatus(403).json({
+            status: "error",
+            message: "Forbidden"
+        });
     }
 
-    // Verify the validity of the refresh token
+    // verify the refresh-token
     jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET_KEY,
         (err, decoded) => {
-            // Return forbidden if token is expired, tampered with, or user mismatched
             if (err || foundUser.username !== decoded.username) {
-                return res.sendStatus(403); // Forbidden
+                return res.sendStatus(403).json({
+                    status: "error",
+                    message: "Forbidden"
+                });
             }
 
-            // Generate a new short-lived access token with the original user payload
+            // generate a new access token
             const accessToken = jwt.sign(
                 {
                     "id": foundUser._id,
@@ -43,7 +48,7 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
                 { expiresIn: "100s" }
             );
 
-            // Send the new access token back to the client
+            // send the new access token back to the client
             return res.json({ accessToken });
         }
     );

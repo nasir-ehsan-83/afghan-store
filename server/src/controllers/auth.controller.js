@@ -6,7 +6,7 @@ import { asyncHandler } from "../utils/async.handler.js";
 export const handleLoginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body; 
 
-    // Find user
+    // find user
     const user = await UserModel.findOne({ username }); 
 
     if (!user) { 
@@ -15,7 +15,7 @@ export const handleLoginUser = asyncHandler(async (req, res) => {
         throw error;
     } 
 
-    // Compare passwords
+    // compare passwords
     const passwordMatch = await bcrypt.compare(password, user.password); 
 
     if (!passwordMatch) { 
@@ -24,17 +24,18 @@ export const handleLoginUser = asyncHandler(async (req, res) => {
         throw error;
     } 
 
-    // Token Payload
+    // token Payload
     const userPayload = { 
         id: user._id,
+        name: user.name,
         role: user.role
     };
 
-    // Generate Tokens
+    // generate Tokens
     const accessToken = jwt.sign( 
         userPayload, 
         process.env.ACCESS_TOKEN_SECRET_KEY, 
-        { expiresIn: "15m" } // Changed from 100s to 15m for better UX
+        { expiresIn: "15m" }
     ); 
 
     const refreshToken = jwt.sign( 
@@ -43,13 +44,13 @@ export const handleLoginUser = asyncHandler(async (req, res) => {
         { expiresIn: "1d" } 
     ); 
 
-    // Save Refresh Token to DB
+    // save Refresh-Token to DB
     await UserModel.updateOne(
         { _id: user._id }, 
         { refresh_token: refreshToken }
     ); 
 
-    // Set secure cookie
+    // set secure cookie
     res.cookie("jwt", refreshToken, { 
         httpOnly: true, 
         secure: process.env.NODE_ENV === "production", // Secure in production
@@ -57,7 +58,10 @@ export const handleLoginUser = asyncHandler(async (req, res) => {
         maxAge: 24 * 60 * 60 * 1000 
     }); 
 
-    return res.json({ accessToken }); 
+    return res.json({ 
+        accessToken,
+        userPayload
+    }); 
 });
 
 
