@@ -13,12 +13,7 @@ export const createUserSchema = z.object({
         name: z.string().min(3, "Name's length should not be less than 3"),
         username: z.string().min(3, "Username's length should not be less than 3"),
         email: z.string().email("Invalid email format").min(7),
-        password: z.string().min(8, "Password length should not be less than 8"),
-        role: z.enum(["USER", "ADMIN"], {
-            errorMap: () => ({ 
-                message: "Role must be either USER or ADMIN" 
-            })
-        }).optional() 
+        password: z.string().min(8, "Password length should not be less than 8")
     })
 });
 
