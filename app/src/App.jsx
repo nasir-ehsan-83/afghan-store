@@ -13,6 +13,8 @@ import AddProduct from "./admin/AddProduct.jsx";
 import EditProduct from "./admin/EditProduct.jsx";
 import ProductList from "./admin/ProductList.jsx";
 import Navbar from "./components/Navbar.jsx";
+import Checkout from "./pages/Checkout.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
 
 const Layout = () => {
   return (
@@ -32,6 +34,8 @@ const router = createBrowserRouter([
       {path: "/products/:id", element: <ProductDetails/>},
       {path: "/signup", element: <Signup/>},
       {path: "/carts/:userId", element: <Cart/>},
+      {path: "/checkout/:userId", element: <Checkout/>},
+      {path: "/forgot-password", element: <ForgotPassword/>},
 
       {path: "/admin/products", element: <ProductList/>},
       {path: "/admin/products/add", element: <AddProduct/>},
