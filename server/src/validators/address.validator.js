@@ -6,10 +6,11 @@ export const createAddressSchema = z.object({
         userId: objectIdSchema,
         fullName: z.string(),
         phone: z.string(),
-        addressLine: z.string(),
+        street: z.string(),
         city: z.string(),
         state: z.string(),
-        pincode: z.string()
+        country: z.string(),
+        zipCode: z.string()
     })
 });
 
@@ -26,10 +27,11 @@ export const addressResponseSchema = z.strictObject({
         userId: objectIdSchema,
         fullName: z.string(),
         phone: z.string(),
-        addressLine: z.string(),
+        street: z.string(),
         city: z.string(),
         state: z.string(),
-        pincode: z.string()
+        country: z.string(),
+        zipCode: z.string()
     })
     // use transform to convert MongoDB's ObjectId to valid string
 }).transform((data) => ({
@@ -39,9 +41,10 @@ export const addressResponseSchema = z.strictObject({
         userId: data.address.userId.toString(),
         fullName: data.address.fullName,            
         phone: data.address.phone,                 
-        addressLine: data.address.addressLine,     
+        street: data.address.street,     
         city: data.address.city,                   
         state: data.address.state,                 
-        pincode: data.address.pincode             
+        country: data.country,
+        zipCode: data.address.zipCode             
     }
 }));
