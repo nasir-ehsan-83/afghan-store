@@ -6,12 +6,15 @@ const addressSchema = new mongoose.Schema({
         required: true,
         ref: "User"
     },
-    fullName: String,
+    fullName: {
+        type: String,
+        required: true
+    },
     phone: {
         type: String,
         required: true
     },
-    addressLine: String,
+    street: String,
     city: {
         type: String,
         required: true
@@ -20,7 +23,11 @@ const addressSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    pincode: String
+    country: {
+        type: String,
+        required: true
+    },
+    zipCode: String
 },{
     timestamps: true
 });
