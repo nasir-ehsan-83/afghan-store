@@ -19,7 +19,7 @@ router.post(
     handleLoginUser
 );
 router.get(
-    '/', 
+    '/refresh', 
     handleRefreshToken
 );
 router.get(

@@ -2,7 +2,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"; 
 import { UserModel } from "../models/user.model.js"; 
 import { asyncHandler } from "../utils/async.handler.js";
-
+import { 
+    AppError,
+    forbidden,
+    notFound,
+    unauthorized
+ } from "../utils/error.js";
 
 
 export const handleLoginUser = asyncHandler(async (req, res) => {
@@ -12,18 +17,14 @@ export const handleLoginUser = asyncHandler(async (req, res) => {
     const user = await UserModel.findOne({ username }); 
 
     if (!user) { 
-        const error = new Error("Invalid credentials: User does not exist");
-        error.statusCode = 404;
-        throw error;
+        return notFound("User does not exist");
     } 
 
     // compare passwords
     const passwordMatch = await bcrypt.compare(password, user.password); 
 
     if (!passwordMatch) { 
-        const error = new Error("Invalid credentials: Correct password required");
-        error.statusCode = 401;
-        throw error;
+        return unauthorized("Correct password required");
     } 
 
     // token Payload
@@ -73,7 +74,7 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
 
     // check if the JWT cookie exists in the request
     if (!cookies?.jwt) {
-        return res.sendStatus(401); // Unauthorized
+        return unauthorized()
     }
 
     // extract the refresh-token from cookies
@@ -84,10 +85,7 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
 
     // if no user matches this token
     if (!foundUser) {
-        return res.sendStatus(403).json({
-            status: "error",
-            message: "Forbidden"
-        });
+        return forbidden("Forbidden");
     }
 
     // verify the refresh-token
@@ -96,10 +94,7 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
         process.env.REFRESH_TOKEN_SECRET_KEY,
         (err, decoded) => {
             if (err || foundUser.username !== decoded.username) {
-                return res.sendStatus(403).json({
-                    status: "error",
-                    message: "Forbidden"
-                });
+                return forbidden("Forbidden");
             }
 
             // generate a new access token
@@ -132,7 +127,7 @@ export const handleLogoutUser = asyncHandler(async (req, res) => {
             sameSite: "None", 
             secure: true 
         });
-        return res.sendStatus(204); 
+        return AppError("", 204);
     }
 
     const refreshToken = cookies.jwt;
@@ -147,7 +142,7 @@ export const handleLogoutUser = asyncHandler(async (req, res) => {
             sameSite: "None", 
             secure: true 
         });
-        return res.sendStatus(204);
+        return AppError("", 204);
     }
 
     // delete refresh_token from database

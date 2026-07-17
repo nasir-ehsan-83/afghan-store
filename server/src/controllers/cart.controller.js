@@ -1,6 +1,7 @@
 import { CartModel } from "../models/cart.model.js";
 import { ProductModel } from "../models/product.model.js";
 import { asyncHandler } from "../utils/async.handler.js";
+import { badRequest, notFound } from "../utils/error.js";
 
 export const addToCart = asyncHandler(async (req, res) => {
     // get userId, productId from req.body
@@ -11,16 +12,12 @@ export const addToCart = asyncHandler(async (req, res) => {
 
     // if product does not exist in DB
     if (!product) {
-        const error = new Error("Product not found");
-        error.statusCode = 404;
-        throw error;
+        return notFound("Product not found");
     }
     
     // otherwise if product.stock is less than quantity
     if (product.stock < quantity) {
-        const error = new Error(`Only ${product.stock} units available`);
-        error.statusCode = 400;
-        throw error;
+        return badRequest(`Only ${product.stock} units available`);
     }
     
     // find Cart from DB and update it
@@ -58,9 +55,7 @@ export const removeItem = asyncHandler(async (req, res) => {
 
     // if Cart does not exist
     if (!cart) {
-        return res.status(404).json({
-            message: "Cart not found"
-        });
+        return notFound("Car not found");
     }
 
     // if number of items is 0
@@ -84,9 +79,7 @@ export const updateQuantity = asyncHandler(async (req, res) => {
 
     // if quanity is 0 or less than that
     if (quantity <= 0) {
-        const error = new Error("Quantity must be a positive number");
-        error.statusCode = 400;
-        throw error;
+        return badRequest("Quantity must be a positive number");
     }
 
     // get product from DB
@@ -94,9 +87,7 @@ export const updateQuantity = asyncHandler(async (req, res) => {
 
     // if prodcut exists and its stock is greater than guantity
     if (product && product.stock < quantity) {
-        const error = new Error(`Insufficient stock. Only ${product.stock} available`);
-        error.statusCode = 400;
-        throw error;
+        return badRequest(`Insufficient stock. Only ${product.stock} available`);
     }
 
     // find Cart and update it 
@@ -108,9 +99,7 @@ export const updateQuantity = asyncHandler(async (req, res) => {
 
     // if Cart does not exist
     if (!cart) {
-        return res.status(404).json({
-            message: "Cart or Item not found"
-        });
+        return notFound("Cart or Item not found");
     }
 
     return res.status(200).json({

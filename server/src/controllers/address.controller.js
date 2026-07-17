@@ -1,5 +1,6 @@
 import { AddressModel } from "../models/address.model.js";
 import { asyncHandler } from "../utils/async.handler.js";
+import { notFound } from "../utils/error.js";
 
 export const saveAddress = asyncHandler(async (req, res) => {
     // save address to DB
@@ -19,10 +20,7 @@ export const getAddress = asyncHandler(async (req, res) => {
 
     // if address does not exist
     if (!address) {
-        return res.status(404).json({
-            status: "failed",
-            message: "Address does not exist"
-        });
+        return notFound("Address does not exist");
     }
 
     res.status(200).json({

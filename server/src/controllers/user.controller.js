@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 
 import { UserModel } from "../models/user.model.js";
 import { asyncHandler } from "../utils/async.handler.js";
+import { conflict, notFound } from "../utils/error.js";
 
 export const createUser = asyncHandler(async (req, res) => {
     // extract user details from req.body
@@ -14,9 +15,7 @@ export const createUser = asyncHandler(async (req, res) => {
 
     // if user already exist
     if (userExist) { 
-        const error = new Error("User already exists!");
-        error.statusCode = 400;
-        throw error;
+        return conflict("User already exists!");
     } 
 
     // hash the password
@@ -43,10 +42,7 @@ export const getUser = asyncHandler(async (req, res) => {
 
    // if user not found
     if (!foundUser) {
-        return res.status(404).json({
-            status: "error",
-            message: "User not found"
-        });
+        return notFound("User not found");
     }
 
     // Return exact object to match userResponseSchema
@@ -73,10 +69,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 
     // if user does not exist
     if (!foundUser) {
-        return res.status(404).json({
-            status: "error",
-            message: "User not found"
-        });
+        return notFound("User not found");
     }
 
     const { name, username, email, password } = req.body;
@@ -107,10 +100,7 @@ export const deleteUser = asyncHandler(async (req, res) => {
 
     // if user does not exist in DB
     if (!deletedUser) {
-        return res.status(404).json({
-            status: "error",
-            message: "User not found"
-        });
+        return notFound("User not Found");
     }
      
     // clear jwt-token from cookies after deletting user 

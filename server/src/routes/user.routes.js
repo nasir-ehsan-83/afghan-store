@@ -3,7 +3,7 @@ import { Router } from "express";
 import { validateRequest } from "../middlewares/validate.request.middleware.js";
 import { validateResponse } from "../middlewares/validate.response.middleware.js";
 import { checkRole } from "../middlewares/role.check.middleware.js";
-import { getCurrentUser } from "../middlewares/current.user.middleware.js";
+import { getCurrentUser } from "../middlewares/auth.middleware.js";
 import { 
     createUserSchema,
     userResponseSchema,

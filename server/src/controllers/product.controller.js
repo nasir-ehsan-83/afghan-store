@@ -1,5 +1,6 @@
 import { ProductModel } from "../models/product.model.js";
 import { asyncHandler } from "../utils/async.handler.js";
+import { notFound } from "../utils/error.js";
 
 export const createProduct = asyncHandler(async (req, res) => {
     // create new product
@@ -20,10 +21,7 @@ export const getProduct = asyncHandler(async (req, res) => {
 
     // if product does not exist
     if (!foundProduct) {
-        return res.status(404).json({
-            status: "error",
-            message: "Product not found"
-        });
+        return notFound("Product not found");
     }
 
     return res.status(200).json(foundProduct);
@@ -60,10 +58,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
     // if product not found
     if (!foundProduct) {
-        return res.status(404).json({
-            status: "error",
-            message: "Product does not exist"
-        });
+        return notFound("Product does not exist");
     }
 
     // get fields by destructuring req.body
@@ -91,10 +86,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
     // if product does not exist
     if (!deletedProduct) {
-        return res.status(404).json({
-            status: "error",
-            message: "Product does not exist"
-        });
+        return notFound("Product does not exist");
     }
 
     return res.status(200).json({
